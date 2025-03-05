@@ -54,12 +54,17 @@ Halo {nama}, ini adalah pesan otomatis untuk Anda. Semoga harimu menyenangkan!
 
                     let pesan = pesanTemplate.replace("{nama}", nama);
                     let encodedMessage = encodeURIComponent(pesan);
+                    let waUrl = `https://wa.me/${nomor}?text=${encodedMessage}`;
+
+                    let waWindow = window.open(waUrl, "_blank");
 
                     statusText.innerHTML = `📩 Mengirim ke: ${nama} (${nomor}) - ${index + 1} dari ${totalPesan}`;
-                    window.open(`https://wa.me/${nomor}?text=${encodedMessage}`, "_blank");
 
-                    index++;
-                    setTimeout(kirimPesan, 3000); // Jeda 3 detik sebelum mengirim berikutnya
+                    setTimeout(() => {
+                        waWindow.close();
+                        index++;
+                        kirimPesan();
+                    }, 5000); // Jeda 5 detik sebelum melanjutkan
                 }
 
                 kirimPesan();
