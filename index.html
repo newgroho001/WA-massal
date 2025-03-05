@@ -15,6 +15,7 @@ Halo {nama}, ini adalah pesan otomatis untuk Anda. Semoga harimu menyenangkan!
     </textarea>
     <br><br>
     <button onclick="prosesFile()">Proses File & Kirim WA</button>
+    <p id="status"></p>
 
     <script>
         function prosesFile() {
@@ -32,8 +33,18 @@ Halo {nama}, ini adalah pesan otomatis untuk Anda. Semoga harimu menyenangkan!
                 let jsonData = XLSX.utils.sheet_to_json(sheet);
 
                 let pesanTemplate = document.getElementById("pesanTemplate").value;
+                let statusText = document.getElementById("status");
 
-                jsonData.forEach((row, index) => {
+                let totalPesan = jsonData.length;
+                let index = 0;
+
+                function kirimPesan() {
+                    if (index >= totalPesan) {
+                        statusText.innerHTML = "✅ Semua pesan telah dikirim!";
+                        return;
+                    }
+
+                    let row = jsonData[index];
                     let nomor = row["Nomor"] ? row["Nomor"].toString().replace(/\D/g, "") : "";
                     let nama = row["Nama"] || "Pelanggan";
 
@@ -44,10 +55,14 @@ Halo {nama}, ini adalah pesan otomatis untuk Anda. Semoga harimu menyenangkan!
                     let pesan = pesanTemplate.replace("{nama}", nama);
                     let encodedMessage = encodeURIComponent(pesan);
 
-                    setTimeout(() => {
-                        window.open(`https://wa.me/${nomor}?text=${encodedMessage}`, "_blank");
-                    }, index * 2000);
-                });
+                    statusText.innerHTML = `📩 Mengirim ke: ${nama} (${nomor}) - ${index + 1} dari ${totalPesan}`;
+                    window.open(`https://wa.me/${nomor}?text=${encodedMessage}`, "_blank");
+
+                    index++;
+                    setTimeout(kirimPesan, 3000); // Jeda 3 detik sebelum mengirim berikutnya
+                }
+
+                kirimPesan();
             };
 
             reader.readAsArrayBuffer(file);
