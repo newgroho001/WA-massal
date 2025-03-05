@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kirim WA Massal dengan Nama</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+    <title>Kirim WA Massal</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
     <h2>Kirim WA Massal dari XLSX</h2>
     <input type="file" id="fileInput" accept=".xlsx">
     <br><br>
-    <button onclick="processExcel()">Proses File & Kirim WA</button>
+    <textarea id="pesanTemplate" rows="4" cols="50" placeholder="Tulis pesan di sini, gunakan {nama} untuk personalisasi...">
+Halo {nama}, ini adalah pesan otomatis untuk Anda. Semoga harimu menyenangkan!
+    </textarea>
+    <br><br>
+    <button onclick="prosesFile()">Proses File & Kirim WA</button>
 
     <script>
-        function processExcel() {
-            let fileInput = document.getElementById("fileInput");
-            let file = fileInput.files[0];
-
+        function prosesFile() {
+            let file = document.getElementById("fileInput").files[0];
             if (!file) {
                 alert("Pilih file XLSX terlebih dahulu!");
                 return;
@@ -26,26 +28,25 @@
             reader.onload = function (e) {
                 let data = new Uint8Array(e.target.result);
                 let workbook = XLSX.read(data, { type: "array" });
-
-                // Ambil sheet pertama
                 let sheet = workbook.Sheets[workbook.SheetNames[0]];
                 let jsonData = XLSX.utils.sheet_to_json(sheet);
 
-                // Pesan yang akan dikirim (menggunakan placeholder {nama})
-                let messageTemplate = "Halo {nama}, ini adalah pesan otomatis untuk Anda. Semoga harimu menyenangkan!";
+                let pesanTemplate = document.getElementById("pesanTemplate").value;
 
-                // Kirim pesan ke setiap nomor
                 jsonData.forEach((row, index) => {
-                    let number = row["Nomor"]; // Kolom "Nomor" di Excel
-                    let name = row["Nama"];   // Kolom "Nama" di Excel
+                    let nomor = row["Nomor"] ? row["Nomor"].toString().replace(/\D/g, "") : "";
+                    let nama = row["Nama"] || "Pelanggan";
 
-                    // Gantikan {nama} dalam pesan dengan nama dari Excel
-                    let personalizedMessage = messageTemplate.replace("{nama}", name);
-                    let encodedMessage = encodeURIComponent(personalizedMessage);
+                    if (!nomor.startsWith("62")) {
+                        nomor = "62" + nomor.substring(1);
+                    }
+
+                    let pesan = pesanTemplate.replace("{nama}", nama);
+                    let encodedMessage = encodeURIComponent(pesan);
 
                     setTimeout(() => {
-                        window.open(`https://wa.me/${number}?text=${encodedMessage}`, "_blank");
-                    }, index * 2000); // Delay 2 detik per nomor
+                        window.open(`https://wa.me/${nomor}?text=${encodedMessage}`, "_blank");
+                    }, index * 2000);
                 });
             };
 
