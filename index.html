@@ -3,68 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kirim WA Massal dengan Personalisasi Nama</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <title>NEWGROHO24 PORTAL</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h2>Kirim WA Massal dengan Personalisasi Nama</h2>
-
-    <label for="fileInput">Pilih File XLSX:</label>
-    <input type="file" id="fileInput" accept=".xlsx"><br><br>
-
-    <label for="pesanDefault">Pesan:</label><br>
-    <textarea id="pesanDefault" rows="4" cols="50" placeholder="Contoh: Halo {nama}, semoga harimu menyenangkan!"></textarea><br><br>
-
-    <button onclick="prosesFile()">Proses File & Kirim WA</button>
-
-    <script>
-        function prosesFile() {
-            let fileInput = document.getElementById("fileInput").files[0];
-
-            if (!fileInput) {
-                alert("Pilih file XLSX terlebih dahulu!");
-                return;
-            }
-
-            let reader = new FileReader();
-            reader.readAsBinaryString(fileInput);
-            reader.onload = function (e) {
-                let data = e.target.result;
-                let workbook = XLSX.read(data, { type: "binary" });
-                let sheetName = workbook.SheetNames[0]; 
-                let sheet = workbook.Sheets[sheetName];
-                let jsonData = XLSX.utils.sheet_to_json(sheet); 
-
-                if (!jsonData[0].Nomor || !jsonData[0].Nama) {
-                    alert("Format file salah! Pastikan ada kolom 'Nomor' dan 'Nama'.");
-                    return;
-                }
-
-                kirimPesan(jsonData);
-            };
-        }
-
-        function kirimPesan(data, index = 0) {
-            if (index >= data.length) {
-                alert("✅ Semua pesan telah dikirim!");
-                return;
-            }
-
-            let kontak = data[index];
-            let nomor = kontak.Nomor.toString().replace(/\D/g, ""); 
-            let nama = kontak.Nama;
-            let pesanFormat = document.getElementById("pesanDefault").value;
-
-            let pesan = pesanFormat.replace(/{nama}/g, nama);
-
-            let url = `https://wa.me/${nomor}?text=${encodeURIComponent(pesan)}`;
-            let newTab = window.open(url, "_blank");
-
-            setTimeout(() => {
-                newTab.close();
-                kirimPesan(data, index + 1);
-            }, 5000);
-        }
-    </script>
+    <header>
+        <h1>NEWGROHO24 PORTAL</h1>
+        <nav>
+            <a href="index.html">Beranda</a>
+            <a href="login.html">Akun</a>
+            <a href="register.html">Registrasi</a>
+        </nav>
+    </header>
+    <main>
+        <h2>Selamat Datang di NEWGROHO24 PORTAL</h2>
+        <p>Silakan daftar atau login untuk mengakses dashboard.</p>
+    </main>
 </body>
 </html>
